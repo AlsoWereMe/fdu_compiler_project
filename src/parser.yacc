@@ -35,11 +35,27 @@ extern int  yywrap();
   A_boolUOpExpr boolUOpExpr;
   A_leftVal leftVal;
   A_rightVal rightVal;
+  A_rightValList rightValList;
   A_assignStmt assignStmt;
+  // Struct definition
   A_structDef structDef;
+  A_varDeclList varDeclList;
+  // Variable statement
   A_varDeclStmt varDeclStmt;
+  A_varDecl varDecl;
+  A_varDeclScalar varDeclScalar;
+  A_varDeclArray varDeclArray; 
+  A_varDef varDef;
+  A_varDefScalar varDefScalar;
+  A_varDefArray varDefArray; 
+  // Funtion declarae statement
   A_fnDeclStmt fnDeclStmt;
+  A_fnDecl fnDecl;
+  A_paramDecl paramDecl;
+  // Funtion definite statement
   A_fnDef fnDef;
+  A_codeBlockStmtList codeBlockStmtList;
+  A_codeBlockStmt codeBlockStmt;
   A_fnCall fnCall;
 }
 
@@ -54,8 +70,8 @@ extern int  yywrap();
 %left  <pos> MUL DIV
 %right <pos> NOT UMINUS
 %left  <pos> POINT ARROW
-
 // Keyword
+%token <type> INT;
 %token <pos> IF
 %token <pos> ELSE
 %token <pos> FN
@@ -75,7 +91,6 @@ extern int  yywrap();
 // Special
 %token <pos> COLON
 %token <pos> SEMICOLON
-%token <type> INT;
 %token <tokenId> ID;
 %token <tokenNum> NUM;
 
@@ -93,12 +108,24 @@ extern int  yywrap();
 %type <boolUOpExpr> BoolUOpExpr
 %type <leftVal> LeftVal
 %type <rightVal> RightVal
+%type <rightValList> RightValList
 %type <assignStmt> AssignStmt
 %type <structDef> StructDef
+%type <varDeclList> VarDeclList
 %type <varDeclStmt> VarDeclStmt
+%type <varDecl> VarDecl
+%type <varDeclScalar> VarDeclScalar
+%type <varDeclArray> VarDeclArray 
+%type <varDef> VarDef
+%type <varDefScalar> VarDefScalar
+%type <varDefArray> VarDefArray 
 %type <fnDeclStmt> FnDeclStmt
+%type <fnDecl> FnDecl
+%type <paramDecl> ParamDecl
 %type <fnDef> FnDef
+%type 
 %type <fnCall> FnCall
+%type <type> Type;
 
 %start Program
 
@@ -146,6 +173,137 @@ ProgramElement:
   }
   ;
 
+VarDeclStmt:
+  LET VarDecl SEMICOLON
+  {
+    $$ = A_VarDeclStmt($2->pos, $2);
+  }
+  |
+  LET VarDef SEMICOLON
+  {
+    $$ = A_VarDefStmt($2->pos, $2);
+  }
+  ;
+
+VarDecl:
+  VarDeclScalar
+  {
+    $$ = A_VarDecl_Scalar($1->pos, $1);
+  }
+  |
+  VarDeclArray
+  {
+    $$ = A_VarDecl_Array($1->pos, $1);
+  }
+  ;
+
+VarDeclScalar:
+  ID COLON Type
+  {
+    $$ = A_VarDeclScalar($1->pos, $1->id, $3);
+  }
+  | ID 
+  {
+    $$ = A_VarDeclScalar($1->pos, $1->id, nullptr);
+  }
+  ;
+
+VarDeclArray:
+  ID LBRACKETS NUM RBRACKETS COLON Type
+  {
+    $$ = A_VarDeclArray($1->pos, $1->id, $3->num, $6);
+  }
+  | ID LBRACKETS NUM RBRACKETS
+  {
+    $$ = A_VarDeclArray($1->pos, $1->id, $3->num, nullptr);
+  }
+  ;
+
+VarDef:
+  VarDefScalar
+  {
+    $$ = A_VarDef_Scalar($1->pos, $1);
+  }
+  | VarDefArray
+  {
+    $$ = A_varDef_Array($1->pos, $1);
+  }
+  ;
+
+VarDefScalar:
+  ID COLON Type ASSIGN RightVal
+  {
+    $$ = A_VarDefScalar($1->pos, $1->id, $3, $5);
+  }
+  | ID ASSIGN RightVal
+  {
+    $$ = A_VarDefScalar($1->pos, $1->id, nullptr, $3);
+  }
+  ;
+
+VarDefArray:
+  ID LBRACKETS NUM RBRACKETS COLON Type ASSIGN LBRACES RightValList RBRACES
+  {
+    $$ = A_VarDefArray($1->pos, $1->id, $3->num, $6, $9);
+  }
+  | ID LBRACKETS NUM RBRACKETS ASSIGN LBRACES RightValList RBRACES 
+  {
+    $$ = A_VarDefArray($1->pos, $1->id, $3->num, nullptr, $7);
+  }
+  ;
+
+StructDef:
+  STRUCT ID LBRACES VarDeclList RBRACES
+  {
+    $$ = A_StructDef($1->pos, $2->id, $4);
+  }
+  ;
+VarDeclList:
+  VarDecl COMMA VarDeclList
+  {
+    $$ = A_VarDeclList($1, $3);
+  }
+  | VarDecl
+  {
+    $$ = A_VarDeclList($1, nullptr);
+  }
+  ;
+
+FnDeclStmt:
+  FnDecl SEMICOLON
+  {
+    $$ = A_FnDeclStmt($1->pos, $1);
+  }
+  ;
+
+FnDecl:
+  FN ID LPARENT ParamDecl RPARENT ARROW Type
+  {
+    $$ = A_FnDecl($1->pos, $2->id, $4, $7);
+  }
+  | FN ID LPARENT ParamDecl RPARENT
+  {
+    $$ = A_FnDecl($1->pos, $2->id, $4, nullptr);
+  }
+  ;
+
+ParamDecl:
+  VarDeclList
+  {
+    $$ = A_ParamDecl($1);
+  }
+  | 
+  {
+    $$ = A_ParamDecl(nullptr);
+  }
+  ;
+
+FnDef:
+  
+CodeBlockStmtList:
+
+CodeBlockStmt:
+
 ArithExpr: 
   ExprUnit
   {
@@ -180,7 +338,7 @@ ExprUnit:
   }
   | LPARENT ArithExpr RPARENT
   {
-    $$ = A_ArithExprUnit($1->pos, $1);
+    $$ = A_ArithExprUnit($2->pos, $2);
   }
   | ArithUExpr
   {
@@ -221,11 +379,11 @@ BoolUnit:
   }
   | LPARENT BoolExpr RPARENT
   {
-    $$ = A_BoolExprUnit($1->pos, $1);
+    $$ = A_BoolExprUnit($2->pos, $2);
   }
   | LPARENT ComExpr RPARENT
   {
-    $$ = A_ComExprUnit($1->pos, $1);
+    $$ = A_ComExprUnit($2->pos, $2);
   }
   ;
 
@@ -234,7 +392,6 @@ LeftVal:
   ID
   {
     $$ = A_IdExprLVal($1->pos, $1->id);
-
   }
   | ArrayExpr
   {
@@ -254,6 +411,32 @@ RightVal:
   | BoolExpr
   {
     $$ = A_BoolExprRVal($1->pos, $1);
+  }
+  ;
+
+RightValList:
+  RightVal COMMA RightValList
+  {
+    $$ = A_RightValList($1, $3);
+  }
+  | RightVal
+  {
+    $$ = A_RightValList($1, nullptr);
+  }
+  |
+  {
+    $$ = A_RightValList(nullptr, nullptr);
+  }
+  ;
+
+Type:
+  INT 
+  {
+    $$ = A_NativeType($1->pos, A_intTypekind);
+  }
+  | ID 
+  {
+    $$ = A_StructType($1->pos, $1->id);
   }
   ;
 %%
