@@ -8,7 +8,7 @@ declare void @_sysy_stoptime( i32 )
 %Node = type { i32, i32 }
 %Bar = type { %Node, [10 x %Node ], [10 x i32 ] }
 define void @foo( %Bar* %r100 ) {
-bb1:
+foo:
   %r101 = getelementptr %Bar, %Bar* %r100, i32 1
   %r102 = getelementptr %Bar, %Bar* %r101, i32 0, i32 2
   %r103 = getelementptr [10 x i32 ], [10 x i32 ]* %r102, i32 0, i32 3
@@ -17,7 +17,7 @@ bb1:
 }
 
 define i32 @main( ) {
-bb2:
+main:
   call void @_sysy_starttime(i32 18)
   %r104 = alloca [ 10 x %Bar ]
   %r105 = getelementptr [10 x %Bar ], [10 x %Bar ]* %r104, i32 0, i32 0
