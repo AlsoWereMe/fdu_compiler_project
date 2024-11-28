@@ -1,20 +1,19 @@
 #pragma once
-#include <stdlib.h>
-#include <stdio.h>
 #include <iostream>
-#include <math.h>
-#include <time.h>
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
 #include "TeaplAst.h"
 #include "TeaplaAst.h"
-#include <unordered_map>
 
-// token id to token type, including function name to return type
+// Type definitions
 typedef struct tc_type_* tc_type;
-typedef std::unordered_map<string, tc_type> typeMap; 
+typedef std::unordered_map<std::string, tc_type> typeMap;
+typedef std::unordered_map<std::string, std::vector<aA_varDecl>*> paramMemberMap;
+typedef std::unordered_map<std::string, int> arrayLengthMap;
+typedef std::vector<std::string> functionsVector;
 
-// func name to params
-typedef std::unordered_map<string, vector<aA_varDecl>*> paramMemberMap; 
-
+// Function declarations
 void check_Prog(std::ostream& out, aA_program p);
 void check_VarDecl(std::ostream& out, aA_varDeclStmt vd);
 void check_StructDef(std::ostream& out, aA_structDef sd);
@@ -35,7 +34,7 @@ void check_WhileStmt(std::ostream& out, aA_whileStmt ws);
 void check_CallStmt(std::ostream& out, aA_callStmt cs);
 void check_ReturnStmt(std::ostream& out, aA_returnStmt rs);
 
-struct tc_type_{
+struct tc_type_ {
     aA_type type;
     uint isVarArrFunc; // 0 for scalar, 1 for array, 2 for function
 };
