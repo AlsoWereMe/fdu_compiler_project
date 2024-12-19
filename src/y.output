@@ -1,3 +1,6 @@
+State 113 conflicts: 1 shift/reduce
+
+
 Grammar
 
     0 $accept: Program $end
@@ -134,7 +137,7 @@ Grammar
    92 CallStmt: Fncall SEMICOLON
 
    93 BoolUnit_: LPAR ComExpr RPAR
-   94          | LPAR BoolUOpExpr
+   94          | LPAR BoolUOpExpr RPAR
    95          | LPAR BoolExpr RPAR
 
    96 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE
@@ -156,7 +159,7 @@ Terminals, with rules where they appear
     COLON <pos> (264) 53 55 59 61 66 67
     COMMA <pos> (265) 46 68 71
     LPAR <pos> (266) 18 30 32 45 75 76 93 94 95
-    RPAR <pos> (267) 18 30 32 45 75 76 93 95
+    RPAR <pos> (267) 18 30 32 45 75 76 93 94 95
     LBRACKET <pos> (268) 24 25 55 56 61 62 67
     RBRACKET <pos> (269) 24 25 55 56 61 62 67
     LBRACE <pos> (270) 61 62 65 78 96 97 98
@@ -1086,7 +1089,7 @@ State 78
 State 79
 
    93 BoolUnit_: LPAR • ComExpr RPAR
-   94          | LPAR • BoolUOpExpr
+   94          | LPAR • BoolUOpExpr RPAR
    95          | LPAR • BoolExpr RPAR
 
     SUB   shift, and go to state 56
@@ -1500,9 +1503,11 @@ State 112
 State 113
 
    31 BoolUnit: BoolUOpExpr •
-   94 BoolUnit_: LPAR BoolUOpExpr •
+   94 BoolUnit_: LPAR BoolUOpExpr • RPAR
 
-    LBRACE    reduce using rule 94 (BoolUnit_)
+    RPAR  shift, and go to state 153
+
+    RPAR      [reduce using rule 31 (BoolUnit)]
     $default  reduce using rule 31 (BoolUnit)
 
 
@@ -1510,7 +1515,7 @@ State 114
 
    93 BoolUnit_: LPAR ComExpr • RPAR
 
-    RPAR  shift, and go to state 153
+    RPAR  shift, and go to state 154
 
 
 State 115
@@ -1535,7 +1540,7 @@ State 115
     LeftVal            go to state 43
     Fncall             go to state 44
     VarDeclStmt        go to state 45
-    CodeBlockStmtList  go to state 154
+    CodeBlockStmtList  go to state 155
     CodeBlockStmt      go to state 47
     ReturnStmt         go to state 48
     CallStmt           go to state 49
@@ -1564,7 +1569,7 @@ State 116
     LeftVal            go to state 43
     Fncall             go to state 44
     VarDeclStmt        go to state 45
-    CodeBlockStmtList  go to state 155
+    CodeBlockStmtList  go to state 156
     CodeBlockStmt      go to state 47
     ReturnStmt         go to state 48
     CallStmt           go to state 49
@@ -1577,7 +1582,7 @@ State 117
    46 RightValList: RightVal • COMMA RightValList
    47             | RightVal •
 
-    COMMA  shift, and go to state 156
+    COMMA  shift, and go to state 157
 
     $default  reduce using rule 47 (RightValList)
 
@@ -1586,7 +1591,7 @@ State 118
 
    45 Fncall: ID LPAR RightValList • RPAR
 
-    RPAR  shift, and go to state 157
+    RPAR  shift, and go to state 158
 
 
 State 119
@@ -1600,21 +1605,21 @@ State 120
 
    24 IndexExpr: LBRACKET NUM • RBRACKET
 
-    RBRACKET  shift, and go to state 158
+    RBRACKET  shift, and go to state 159
 
 
 State 121
 
    25 IndexExpr: LBRACKET ID • RBRACKET
 
-    RBRACKET  shift, and go to state 159
+    RBRACKET  shift, and go to state 160
 
 
 State 122
 
    40 AssignStmt: LeftVal ASSIGN RightVal • SEMICOLON
 
-    SEMICOLON  shift, and go to state 160
+    SEMICOLON  shift, and go to state 161
 
 
 State 123
@@ -1632,14 +1637,14 @@ State 124
     INT  shift, and go to state 52
     ID   shift, and go to state 53
 
-    Type  go to state 161
+    Type  go to state 162
 
 
 State 125
 
    62 VarDefArray: ID LBRACKET NUM RBRACKET ASSIGN • LBRACE RightValList RBRACE
 
-    LBRACE  shift, and go to state 162
+    LBRACE  shift, and go to state 163
 
 
 State 126
@@ -1711,7 +1716,7 @@ State 132
    55 VarDeclArray: ID LBRACKET NUM • RBRACKET COLON Type
    56             | ID LBRACKET NUM • RBRACKET
 
-    RBRACKET  shift, and go to state 163
+    RBRACKET  shift, and go to state 164
 
 
 State 133
@@ -1728,7 +1733,7 @@ State 134
     INT  shift, and go to state 52
     ID   shift, and go to state 53
 
-    Type  go to state 164
+    Type  go to state 165
 
 
 State 135
@@ -1742,7 +1747,7 @@ State 136
 
    67 FieldDecl: ID LBRACKET NUM • RBRACKET COLON Type
 
-    RBRACKET  shift, and go to state 165
+    RBRACKET  shift, and go to state 166
 
 
 State 137
@@ -1778,7 +1783,7 @@ State 139
    29             | BoolExpr • OR BoolExpr
    32 BoolUnit: LPAR BoolExpr • RPAR
 
-    RPAR  shift, and go to state 166
+    RPAR  shift, and go to state 167
     AND   shift, and go to state 151
     OR    shift, and go to state 152
 
@@ -1794,7 +1799,7 @@ State 141
 
    30 BoolUnit: LPAR ComExpr • RPAR
 
-    RPAR  shift, and go to state 167
+    RPAR  shift, and go to state 168
 
 
 State 142
@@ -1836,7 +1841,7 @@ State 144
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 168
+    ExprUnit    go to state 169
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1852,7 +1857,7 @@ State 145
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 169
+    ExprUnit    go to state 170
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1868,7 +1873,7 @@ State 146
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 170
+    ExprUnit    go to state 171
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1884,7 +1889,7 @@ State 147
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 171
+    ExprUnit    go to state 172
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1900,7 +1905,7 @@ State 148
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 172
+    ExprUnit    go to state 173
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1916,7 +1921,7 @@ State 149
     NUM   shift, and go to state 58
     ID    shift, and go to state 59
 
-    ExprUnit    go to state 173
+    ExprUnit    go to state 174
     ArrayExpr   go to state 63
     MemberExpr  go to state 64
     LeftVal     go to state 65
@@ -1937,7 +1942,7 @@ State 151
     LPAR  shift, and go to state 142
     NOT   shift, and go to state 108
 
-    BoolExpr      go to state 174
+    BoolExpr      go to state 175
     BoolBiOpExpr  go to state 111
     BoolUnit      go to state 112
     BoolUOpExpr   go to state 140
@@ -1950,7 +1955,7 @@ State 152
     LPAR  shift, and go to state 142
     NOT   shift, and go to state 108
 
-    BoolExpr      go to state 175
+    BoolExpr      go to state 176
     BoolBiOpExpr  go to state 111
     BoolUnit      go to state 112
     BoolUOpExpr   go to state 140
@@ -1958,27 +1963,34 @@ State 152
 
 State 153
 
+   94 BoolUnit_: LPAR BoolUOpExpr RPAR •
+
+    $default  reduce using rule 94 (BoolUnit_)
+
+
+State 154
+
    93 BoolUnit_: LPAR ComExpr RPAR •
 
     $default  reduce using rule 93 (BoolUnit_)
 
 
-State 154
+State 155
 
    96 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList • RBRACE
    97       | IF BoolUnit_ LBRACE CodeBlockStmtList • RBRACE ELSE LBRACE CodeBlockStmtList RBRACE
-
-    RBRACE  shift, and go to state 176
-
-
-State 155
-
-   98 WhileStmt: WHILE BoolUnit_ LBRACE CodeBlockStmtList • RBRACE
 
     RBRACE  shift, and go to state 177
 
 
 State 156
+
+   98 WhileStmt: WHILE BoolUnit_ LBRACE CodeBlockStmtList • RBRACE
+
+    RBRACE  shift, and go to state 178
+
+
+State 157
 
    46 RightValList: RightVal COMMA • RightValList
 
@@ -1997,48 +2009,48 @@ State 156
     LeftVal        go to state 65
     RightVal       go to state 117
     Fncall         go to state 67
-    RightValList   go to state 178
+    RightValList   go to state 179
 
 
-State 157
+State 158
 
    45 Fncall: ID LPAR RightValList RPAR •
 
     $default  reduce using rule 45 (Fncall)
 
 
-State 158
+State 159
 
    24 IndexExpr: LBRACKET NUM RBRACKET •
 
     $default  reduce using rule 24 (IndexExpr)
 
 
-State 159
+State 160
 
    25 IndexExpr: LBRACKET ID RBRACKET •
 
     $default  reduce using rule 25 (IndexExpr)
 
 
-State 160
+State 161
 
    40 AssignStmt: LeftVal ASSIGN RightVal SEMICOLON •
 
     $default  reduce using rule 40 (AssignStmt)
 
 
-State 161
+State 162
 
    55 VarDeclArray: ID LBRACKET NUM RBRACKET COLON Type •
    61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type • ASSIGN LBRACE RightValList RBRACE
 
-    ASSIGN  shift, and go to state 179
+    ASSIGN  shift, and go to state 180
 
     $default  reduce using rule 55 (VarDeclArray)
 
 
-State 162
+State 163
 
    62 VarDefArray: ID LBRACKET NUM RBRACKET ASSIGN LBRACE • RightValList RBRACE
 
@@ -2057,90 +2069,90 @@ State 162
     LeftVal        go to state 65
     RightVal       go to state 117
     Fncall         go to state 67
-    RightValList   go to state 180
+    RightValList   go to state 181
 
 
-State 163
+State 164
 
    55 VarDeclArray: ID LBRACKET NUM RBRACKET • COLON Type
    56             | ID LBRACKET NUM RBRACKET •
 
-    COLON  shift, and go to state 181
+    COLON  shift, and go to state 182
 
     $default  reduce using rule 56 (VarDeclArray)
 
 
-State 164
+State 165
 
    76 FnDecl: FN ID LPAR ParamDecl RPAR ARROW Type •
 
     $default  reduce using rule 76 (FnDecl)
 
 
-State 165
+State 166
 
    67 FieldDecl: ID LBRACKET NUM RBRACKET • COLON Type
 
-    COLON  shift, and go to state 182
+    COLON  shift, and go to state 183
 
 
-State 166
+State 167
 
    32 BoolUnit: LPAR BoolExpr RPAR •
 
     $default  reduce using rule 32 (BoolUnit)
 
 
-State 167
+State 168
 
    30 BoolUnit: LPAR ComExpr RPAR •
 
     $default  reduce using rule 30 (BoolUnit)
 
 
-State 168
+State 169
 
    35 ComExpr: ExprUnit LT ExprUnit •
 
     $default  reduce using rule 35 (ComExpr)
 
 
-State 169
+State 170
 
    34 ComExpr: ExprUnit GT ExprUnit •
 
     $default  reduce using rule 34 (ComExpr)
 
 
-State 170
+State 171
 
    37 ComExpr: ExprUnit LE ExprUnit •
 
     $default  reduce using rule 37 (ComExpr)
 
 
-State 171
+State 172
 
    36 ComExpr: ExprUnit GE ExprUnit •
 
     $default  reduce using rule 36 (ComExpr)
 
 
-State 172
+State 173
 
    38 ComExpr: ExprUnit EQ ExprUnit •
 
     $default  reduce using rule 38 (ComExpr)
 
 
-State 173
+State 174
 
    39 ComExpr: ExprUnit NEQ ExprUnit •
 
     $default  reduce using rule 39 (ComExpr)
 
 
-State 174
+State 175
 
    28 BoolBiOpExpr: BoolExpr • AND BoolExpr
    28             | BoolExpr AND BoolExpr •
@@ -2149,7 +2161,7 @@ State 174
     $default  reduce using rule 28 (BoolBiOpExpr)
 
 
-State 175
+State 176
 
    28 BoolBiOpExpr: BoolExpr • AND BoolExpr
    29             | BoolExpr • OR BoolExpr
@@ -2160,57 +2172,47 @@ State 175
     $default  reduce using rule 29 (BoolBiOpExpr)
 
 
-State 176
+State 177
 
    96 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE •
    97       | IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE • ELSE LBRACE CodeBlockStmtList RBRACE
 
-    ELSE  shift, and go to state 183
+    ELSE  shift, and go to state 184
 
     $default  reduce using rule 96 (IfStmt)
 
 
-State 177
+State 178
 
    98 WhileStmt: WHILE BoolUnit_ LBRACE CodeBlockStmtList RBRACE •
 
     $default  reduce using rule 98 (WhileStmt)
 
 
-State 178
+State 179
 
    46 RightValList: RightVal COMMA RightValList •
 
     $default  reduce using rule 46 (RightValList)
 
 
-State 179
+State 180
 
    61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type ASSIGN • LBRACE RightValList RBRACE
 
-    LBRACE  shift, and go to state 184
-
-
-State 180
-
-   62 VarDefArray: ID LBRACKET NUM RBRACKET ASSIGN LBRACE RightValList • RBRACE
-
-    RBRACE  shift, and go to state 185
+    LBRACE  shift, and go to state 185
 
 
 State 181
 
-   55 VarDeclArray: ID LBRACKET NUM RBRACKET COLON • Type
+   62 VarDefArray: ID LBRACKET NUM RBRACKET ASSIGN LBRACE RightValList • RBRACE
 
-    INT  shift, and go to state 52
-    ID   shift, and go to state 53
-
-    Type  go to state 186
+    RBRACE  shift, and go to state 186
 
 
 State 182
 
-   67 FieldDecl: ID LBRACKET NUM RBRACKET COLON • Type
+   55 VarDeclArray: ID LBRACKET NUM RBRACKET COLON • Type
 
     INT  shift, and go to state 52
     ID   shift, and go to state 53
@@ -2220,12 +2222,22 @@ State 182
 
 State 183
 
-   97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE • LBRACE CodeBlockStmtList RBRACE
+   67 FieldDecl: ID LBRACKET NUM RBRACKET COLON • Type
 
-    LBRACE  shift, and go to state 188
+    INT  shift, and go to state 52
+    ID   shift, and go to state 53
+
+    Type  go to state 188
 
 
 State 184
+
+   97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE • LBRACE CodeBlockStmtList RBRACE
+
+    LBRACE  shift, and go to state 189
+
+
+State 185
 
    61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type ASSIGN LBRACE • RightValList RBRACE
 
@@ -2244,31 +2256,31 @@ State 184
     LeftVal        go to state 65
     RightVal       go to state 117
     Fncall         go to state 67
-    RightValList   go to state 189
+    RightValList   go to state 190
 
 
-State 185
+State 186
 
    62 VarDefArray: ID LBRACKET NUM RBRACKET ASSIGN LBRACE RightValList RBRACE •
 
     $default  reduce using rule 62 (VarDefArray)
 
 
-State 186
+State 187
 
    55 VarDeclArray: ID LBRACKET NUM RBRACKET COLON Type •
 
     $default  reduce using rule 55 (VarDeclArray)
 
 
-State 187
+State 188
 
    67 FieldDecl: ID LBRACKET NUM RBRACKET COLON Type •
 
     $default  reduce using rule 67 (FieldDecl)
 
 
-State 188
+State 189
 
    97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE LBRACE • CodeBlockStmtList RBRACE
 
@@ -2289,7 +2301,7 @@ State 188
     LeftVal            go to state 43
     Fncall             go to state 44
     VarDeclStmt        go to state 45
-    CodeBlockStmtList  go to state 190
+    CodeBlockStmtList  go to state 191
     CodeBlockStmt      go to state 47
     ReturnStmt         go to state 48
     CallStmt           go to state 49
@@ -2297,28 +2309,28 @@ State 188
     WhileStmt          go to state 51
 
 
-State 189
-
-   61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type ASSIGN LBRACE RightValList • RBRACE
-
-    RBRACE  shift, and go to state 191
-
-
 State 190
 
-   97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE LBRACE CodeBlockStmtList • RBRACE
+   61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type ASSIGN LBRACE RightValList • RBRACE
 
     RBRACE  shift, and go to state 192
 
 
 State 191
 
+   97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE LBRACE CodeBlockStmtList • RBRACE
+
+    RBRACE  shift, and go to state 193
+
+
+State 192
+
    61 VarDefArray: ID LBRACKET NUM RBRACKET COLON Type ASSIGN LBRACE RightValList RBRACE •
 
     $default  reduce using rule 61 (VarDefArray)
 
 
-State 192
+State 193
 
    97 IfStmt: IF BoolUnit_ LBRACE CodeBlockStmtList RBRACE ELSE LBRACE CodeBlockStmtList RBRACE •
 

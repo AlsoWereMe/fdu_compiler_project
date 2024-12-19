@@ -141,51 +141,51 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 19 "parser.yacc"
+#line 16 "parser.yacc"
 
-	A_pos pos; //position information
-	A_type type;
-	A_varDecl varDecl;
-	A_varDef varDef;
-	A_rightVal rightVal;
-	A_arithExpr arithExpr;
-	A_boolExpr boolExpr;
-	A_arithBiOpExpr arithBiOpExpr;
-	A_arithUExpr arithUExpr;
-	A_exprUnit exprUnit;
-	A_fnCall fnCall;
-	A_indexExpr indexExpr;
-	A_arrayExpr arrayExpr;
-	A_memberExpr memberExpr;
-	A_boolUnit boolUnit;
-	A_boolBiOpExpr boolBiOpExpr;
-	A_boolUOpExpr boolUOpExpr;
-	A_comExpr comExpr;
-	A_leftVal leftVal;
-	A_assignStmt assignStmt;
-	A_rightValList rightValList;
-	A_varDefScalar varDefScalar;
-	A_varDefArray varDefArray;
-	A_varDeclScalar varDeclScalar;
-	A_varDeclArray varDeclArray;
-	A_varDeclStmt varDeclStmt;
-	A_varDeclList varDeclList;
-	A_structDef structDef;
-	A_paramDecl paramDecl;
-	A_fnDecl fnDecl;
-	A_fnDef fnDef;
-	A_codeBlockStmt codeBlockStmt;
-	A_ifStmt ifStmt;
-	A_whileStmt whileStmt;
-	A_fnDeclStmt fnDeclStmt;
-	A_callStmt callStmt;
-	A_returnStmt returnStmt;
-	A_programElement programElement;
-	A_codeBlockStmtList codeBlockStmtList;
-	A_programElementList programElementList;
-	A_program program;
-	A_tokenId tokenId;
-	A_tokenNum tokenNum;
+    A_pos pos; // Position information
+    A_type type;
+    A_varDecl varDecl;
+    A_varDef varDef;
+    A_rightVal rightVal;
+    A_arithExpr arithExpr;
+    A_boolExpr boolExpr;
+    A_arithBiOpExpr arithBiOpExpr;
+    A_arithUExpr arithUExpr;
+    A_exprUnit exprUnit;
+    A_fnCall fnCall;
+    A_indexExpr indexExpr;
+    A_arrayExpr arrayExpr;
+    A_memberExpr memberExpr;
+    A_boolUnit boolUnit;
+    A_boolBiOpExpr boolBiOpExpr;
+    A_boolUOpExpr boolUOpExpr;
+    A_comExpr comExpr;
+    A_leftVal leftVal;
+    A_assignStmt assignStmt;
+    A_rightValList rightValList;
+    A_varDefScalar varDefScalar;
+    A_varDefArray varDefArray;
+    A_varDeclScalar varDeclScalar;
+    A_varDeclArray varDeclArray;
+    A_varDeclStmt varDeclStmt;
+    A_varDeclList varDeclList;
+    A_structDef structDef;
+    A_paramDecl paramDecl;
+    A_fnDecl fnDecl;
+    A_fnDef fnDef;
+    A_codeBlockStmt codeBlockStmt;
+    A_ifStmt ifStmt;
+    A_whileStmt whileStmt;
+    A_fnDeclStmt fnDeclStmt;
+    A_callStmt callStmt;
+    A_returnStmt returnStmt;
+    A_programElement programElement;
+    A_codeBlockStmtList codeBlockStmtList;
+    A_programElementList programElementList;
+    A_program program;
+    A_tokenId tokenId;
+    A_tokenNum tokenNum;
 
 #line 191 "y.tab.hpp"
 
