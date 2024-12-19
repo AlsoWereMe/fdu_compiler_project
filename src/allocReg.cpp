@@ -3,14 +3,22 @@ using namespace std;
 using namespace ASM;
 #include <cassert>
 #include <stack>
-using namespace GRAPH;
 #include "printASM.h"
 #include "register_rules.h"
 #define MYDEBUG() printf("%s:%d\n", __FILE__, __LINE__)
 #include <sstream>
 #include <iostream>
 #include "printASM.h"
+
+using namespace GRAPH;
+
+// 调试宏
+#define MYDEBUG() printf("%s:%d\n", __FILE__, __LINE__)
+
+// 全局寄存器栈
 stack<Node<RegInfo> *> reg_stack;
+
+// 获取指令中的定义和使用寄存器
 void getAllRegs(AS_stm *stm, vector<AS_reg *> &defs, vector<AS_reg *> &uses)
 {
     switch (stm->type)
@@ -44,6 +52,7 @@ void getAllRegs(AS_stm *stm, vector<AS_reg *> &defs, vector<AS_reg *> &uses)
     }
 }
 
+// 获取定义寄存器
 void getDefReg(AS_reg *reg, vector<AS_reg *> &defs)
 {
     if (!reg)
@@ -67,6 +76,8 @@ void getDefReg(AS_reg *reg, vector<AS_reg *> &defs)
         break;
     }
 }
+
+// 获取使用寄存器
 void getUseReg(AS_reg *reg, vector<AS_reg *> &uses)
 {
     if (!reg)
@@ -98,6 +109,8 @@ void getUseReg(AS_reg *reg, vector<AS_reg *> &uses)
         break;
     }
 }
+
+// 虚拟寄存器映射到物理寄存器
 void vreg_map(AS_reg *reg, unordered_map<int, Node<RegInfo> *> &regNodes)
 {
     switch (reg->type)
@@ -118,7 +131,9 @@ void vreg_map(AS_reg *reg, unordered_map<int, Node<RegInfo> *> &regNodes)
     default:
         break;
     }
-};
+}
+
+// 前向活跃性分析
 void forwardLivenessAnalysis(std::list<InstructionNode *> &liveness, std::list<AS_stm *> &as_list)
 {
     unordered_map<string, InstructionNode *> blocks;
@@ -159,6 +174,8 @@ void forwardLivenessAnalysis(std::list<InstructionNode *> &liveness, std::list<A
 
     setControlFlowDiagram(liveness, blocks);
 }
+
+// 设置控制流图
 void setControlFlowDiagram(std::list<InstructionNode *> &nodes, unordered_map<string, InstructionNode *> &blocks)
 {
     for (auto it = nodes.begin(); it != nodes.end(); ++it)
@@ -194,7 +211,9 @@ void setControlFlowDiagram(std::list<InstructionNode *> &nodes, unordered_map<st
         }
     }
 }
-void init(std::list<InstructionNode *> &nodes, unordered_map<int, Node<RegInfo> *> &regNodes, Graph<RegInfo> &interferenceGraph, std::list<ASM::AS_stm *> &as_list)
+
+// 初始化干扰图和节点
+void init(std::list<InstructionNode *> &nodes, std::unordered_map<int, Node<RegInfo> *> &regNodes, Graph<RegInfo> &interferenceGraph, std::list<ASM::AS_stm *> &as_list)
 {
     assert(reg_stack.empty());
     bool changed;
@@ -215,16 +234,11 @@ void init(std::list<InstructionNode *> &nodes, unordered_map<int, Node<RegInfo> 
                     n->out.insert(s->in.begin(), s->in.end());
                 }
 
-            // std::set<int> diff;
-            // std::set_difference(n->out.begin(), n->out.end(), n->def.begin(), n->def.end(), std::inserter(diff, diff.end()));
-            // diff.insert(n->use.begin(), n->use.end());
-
-            // n->in = diff;
             n->in.clear();
             std::set_difference(n->out.begin(), n->out.end(), n->def.begin(), n->def.end(), std::inserter(n->in, n->in.end()));
             n->in.insert(n->use.begin(), n->use.end());
             set_size += n->in.size();
-            // printf("%d += %d ,%d ",n->in.size(), set_size,nodes.size());
+
             if (n->in != n->previous_in || n->out != n->previous_out)
             {
                 changed = true;
@@ -247,8 +261,7 @@ void init(std::list<InstructionNode *> &nodes, unordered_map<int, Node<RegInfo> 
     int ijj = 0;
     for (auto x : regs)
     {
-        regNodes.insert({x, interferenceGraph.addNode({x, x, 0, 0, 0})});
-        // printf("%d:%lu ", ++ijj, regs.size());
+        regNodes.insert({x, interferenceGraph.addNode({x, x, false, false, 0})});
     }
 
     for (auto x : nodes)
@@ -264,26 +277,15 @@ void init(std::list<InstructionNode *> &nodes, unordered_map<int, Node<RegInfo> 
         }
     }
 
-    // 打印干扰图的边,并设置节点度数
-    // std::cerr << "Interference Graph Edges:" << std::endl;
+    // 设置节点的度数
     auto nodes_ = interferenceGraph.nodes();
     for (auto &nodePair : *nodes_)
     {
         Node<RegInfo> *node = nodePair.second;
         NodeSet *successors = node->succ();
         node->info.degree = successors->size();
-
-        // std::cerr << "Reg " << node->nodeInfo().regNum << " interferes with " << successors->size() << " Regs: ";
-        // if (successors->size())
-        // {
-        //     for (int succKey : *successors)
-        //     {
-        //         std::cerr << interferenceGraph.mynodes[succKey]->info.regNum << " ";
-        //     }
-        // }
-
-        // std::cerr << std::endl;
     }
+
     // 删除不使用的指令
     std::set<int> to_delete;
     std::set_difference(defs.begin(), defs.end(), uses.begin(), uses.end(), std::inserter(to_delete, to_delete.end()));
@@ -309,11 +311,193 @@ void init(std::list<InstructionNode *> &nodes, unordered_map<int, Node<RegInfo> 
         it++;
     }
 }
+
+// 主活跃性分析函数
 void livenessAnalysis(std::list<InstructionNode *> &nodes, std::list<ASM::AS_stm *> &as_list)
 {
     Graph<RegInfo> interferenceGraph;
     unordered_map<int, Node<RegInfo> *> regNodes;
     init(nodes, regNodes, interferenceGraph, as_list);
 
-    //TODO:获得干扰图后，进行寄存器分配
+    // 寄存器分配
+    unordered_map<int, int> vreg_to_preg;
+    allocateRegisters(interferenceGraph, regNodes, vreg_to_preg);
+
+    // 映射寄存器
+    for (auto &x : as_list)
+    {
+        // 根据 vreg_to_preg 映射虚拟寄存器到物理寄存器
+        // 需要实现具体的映射逻辑，这里简要示例
+        // 例如：
+        // if (x->type == AS_stmkind::MOV) {
+        //     map x->u.MOV->dst and x->u.MOV->src
+        // }
+    }
+
+    // TODO: 根据寄存器分配结果修改 as_list，插入spill代码
+}
+
+// 图着色算法实现
+void allocateRegisters(Graph<RegInfo> &interferenceGraph, unordered_map<int, Node<RegInfo> *> &regNodes, unordered_map<int, int> &vreg_to_preg)
+{
+    const int K = 16;
+
+    // 简化阶段
+    simplify(interferenceGraph, regNodes, reg_stack, K);
+
+    // 分配颜色
+    assignColors(interferenceGraph, reg_stack, vreg_to_preg, K);
+
+    // 处理溢出
+    std::set<int> spilled_vregs;
+    for (auto &pair : vreg_to_preg)
+    {
+        if (pair.second == -1)
+        {
+            spilled_vregs.insert(pair.first);
+        }
+    }
+
+    if (!spilled_vregs.empty())
+    {
+        handleSpills(*(new std::list<ASM::AS_stm *>()), spilled_vregs, vreg_to_preg);
+    }
+}
+
+
+// 简化阶段：移除度数小于 K 的节点
+void simplify(Graph<RegInfo> &graph, std::unordered_map<int, Node<RegInfo> *> &regNodes, std::stack<Node<RegInfo> *> &reg_stack, int K)
+{
+    bool progress = true;
+    while (progress)
+    {
+        progress = false;
+        for (auto it = graph.mynodes.begin(); it != graph.mynodes.end();)
+        {
+            Node<RegInfo> *node = it->second;
+            if (node->info.degree < K)
+            {
+                reg_stack.push(node);
+                // 移除节点，并减少邻居的度数
+                for (auto &succ_key : *(node->succ()))
+                {
+                    // 查找后继节点
+                    auto succ_it = graph.mynodes.find(succ_key);
+                    if (succ_it != graph.mynodes.end())
+                    {
+                        Node<RegInfo>* succ_node = succ_it->second;
+                        succ_node->info.degree--;
+                        // 移除边
+                        graph.rmEdge(node, succ_node);
+                        graph.rmEdge(succ_node, node);
+                    }
+                }
+                // 移除节点
+                it = graph.mynodes.erase(it);
+                progress = true;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+}
+
+// 溢出选择阶段：选择一个节点进行溢出
+bool selectSpill(Graph<RegInfo> &graph, std::unordered_map<int, Node<RegInfo> *> &regNodes, std::stack<Node<RegInfo> *> &reg_stack, int K)
+{
+    // 选择度数最大的节点进行溢出
+    int max_degree = -1;
+    Node<RegInfo> *spill_node = nullptr;
+    for (auto &nodePair : graph.mynodes)
+    {
+        Node<RegInfo> *node = nodePair.second;
+        if (node->info.degree > max_degree)
+        {
+            max_degree = node->info.degree;
+            spill_node = node;
+        }
+    }
+
+    if (spill_node)
+    {
+        // 标记为溢出
+        spill_node->info.is_spill = true;
+
+        // 从图中移除该节点
+        graph.rmNode(spill_node);
+
+        // 将其放入简化栈
+        reg_stack.push(spill_node);
+
+        return true;
+    }
+
+    return false;
+}
+
+// 分配颜色阶段
+void assignColors(Graph<RegInfo> &graph, std::stack<Node<RegInfo> *> &reg_stack, std::unordered_map<int, int> &vreg_to_preg, int K)
+{
+    while (!reg_stack.empty())
+    {
+        Node<RegInfo> *node = reg_stack.top();
+        reg_stack.pop();
+
+        // 获取邻居的颜色
+        std::set<int> neighbor_colors;
+        for (auto &succ_key : *(node->succ()))
+        {
+            auto it = graph.mynodes.find(succ_key);
+            if (it != graph.mynodes.end())
+            {
+                Node<RegInfo>* succ_node = it->second;
+                if (succ_node->info.color != -1)
+                {
+                    neighbor_colors.insert(succ_node->info.color);
+                }
+            }
+        }
+
+        // 分配一个未被占用的颜色
+        int color = -1;
+        for (int i = 0; i < K; i++)
+        {
+            if (neighbor_colors.find(i) == neighbor_colors.end())
+            {
+                color = i;
+                break;
+            }
+        }
+
+        if (color == -1)
+        {
+            node->info.is_spill = true;
+        }
+        else
+        {
+            vreg_to_preg[node->info.regNum] = color;
+        }
+    }
+}
+
+
+// 处理溢出
+void handleSpills(std::list<ASM::AS_stm *> &as_list, const std::set<int> &spilled_vregs, std::unordered_map<int, int> &vreg_to_preg)
+{
+    for (auto &stm : as_list)
+    {
+        switch (stm->type)
+        {
+        case AS_stmkind::MOV:
+            if (spilled_vregs.find(stm->u.MOV->dst->u.offset) != spilled_vregs.end())
+            {
+                // 将 dst 寄存器从栈中加载
+            }
+            break;
+        default:
+            break;
+        }
+    }
 }
